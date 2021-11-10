@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from first_app.models import Instrumento, ResultadoMineracao, Cupom, BandaArtista, Empresa
+from first_app.models import Instrumento, ResultadoMineracao, Cupom, BandaArtista, Empresa, Evento
  
  
 class InstrumentoSerializer(serializers.ModelSerializer):
@@ -49,4 +49,17 @@ class BandaArtistaSerializer(serializers.ModelSerializer):
                   'numeroIntegrantes',
                   'cpfOuCnpj',
                   'valorDataHora')
+
+class EventoSerializer(serializers.ModelSerializer):
+ 
+    class Meta:
+        model = Evento
+        fields = ('id',
+                  'idStatus',
+                  'idEmpresa',
+                  'idPorteEvento',
+                  'duracao',
+                  'data',
+                  'nome',
+                  'local')
 

@@ -95,7 +95,6 @@ def gerar_cupoms(request):
             cupomMenosFalado['generoMusical'] = int(generoMenosFalado)
             cupomMenosFalado['valorDataHora'] = datetime.datetime.now()  
 
-            dados ={}
             cupomMaisFaladoSerializado = CupomSerializer(data=cupomMaisFalado)
             cupomMenosFaladoSerializado = CupomSerializer(data=cupomMenosFalado); 
             if cupomMaisFaladoSerializado.is_valid():
