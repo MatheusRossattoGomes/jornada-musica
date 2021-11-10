@@ -86,3 +86,23 @@ class Contrato(models.Model):
     bandaArtistaAceitou = models.BooleanField()
 
 ################################################################################################
+############ CUMPOM ####################################################################################
+
+class ResultadoMineracao(models.Model):
+    maiorTendencia =  models.IntegerField()
+    menorTendencia =  models.IntegerField()
+    valorDataHora = models.DateTimeField()
+
+class Cupom(models.Model):
+    tipoGeneroMusical= (
+    (-1, 'Rock'),
+    (-2, 'Sertanejo'),
+    (-3, 'Pop'),
+    (-4, 'Samba'),
+    (-5, 'Pagode'),
+    (-6, 'Funk'))
+    porcentagem =  models.IntegerField()
+    generoMusical = models.IntegerField(choices=tipoGeneroMusical)
+    valorDataHora = models.DateTimeField()
+
+################################################################################################
