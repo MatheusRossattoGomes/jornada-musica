@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^api/gerar_dados_tweets$', views.gerar_dados_tweets),
     url(r'^api/gerar_cupoms$', views.gerar_cupoms),
     url(r'^api/add_usuario$', views.add_usuario),
+    url(r'^api/add_evento$', views.add_evento),
+    url(r'^api/add_contrato$', views.add_contrato),
 ]

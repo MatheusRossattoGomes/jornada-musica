@@ -4,8 +4,8 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
  
-from first_app.models import Instrumento, ResultadoMineracao
-from first_app.serializers import InstrumentoSerializer, ResultadoMineracaoSerializer, EmpresaSerializer, CupomSerializer, BandaArtistaSerializer
+from first_app.models import Instrumento, ResultadoMineracao, BandaArtista, Evento
+from first_app.serializers import ResultadoMineracaoSerializer, EmpresaSerializer, CupomSerializer, BandaArtistaSerializer, EventoSerializer, ContratoSerializer, InstrumentoSerializer
 from rest_framework.decorators import api_view
 from first_app.mineracao import coletarDadosTweets
 import datetime
@@ -128,19 +128,48 @@ def add_usuario(request):
                     empresa_serializer.save()
                     return JsonResponse(empresa_serializer.data, status=status.HTTP_201_CREATED) 
                 return JsonResponse(empresa_serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
-            
 
+@api_view(['POST'])
+def add_evento(request):
+        if request.method == 'POST':
+            dados = request.data 
+            dados['idStatus'] = -3 # 'Agendado'
+            evento_serializer = EventoSerializer(data=dados)
+            if evento_serializer.is_valid():
+                evento_serializer.save()
+                return JsonResponse(evento_serializer.data, status=status.HTTP_201_CREATED) 
+            return JsonResponse(evento_serializer.errors, status=status.HTTP_400_BAD_REQUEST)                  
 
-@api_view(['GET'])
-def get_valores_Genero_enum(request):
-        if request.method == 'GET':
-            
-            instrumento_json = JSONParser().parse(request)
-            instrumento_serializer = InstrumentoSerializer(data=instrumento_json)
-            if instrumento_serializer.is_valid():
-                instrumento_serializer.save()
-                return JsonResponse(instrumento_serializer.data, status=status.HTTP_201_CREATED) 
-            return JsonResponse(instrumento_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def add_contrato(request):
+        if request.method == 'POST':
+            dados = request.data 
+
+            valorDataHora = get_valor_ora_banda_artista(dados['idBandaArtista'])
+            evento = get_evento(dados['idEvento']) 
+
+            print(evento.idEmpresa.id)
+
+            dados['valorTotal'] = round(valorDataHora * evento.duracao, 2)
+            dados['empresaAceitou'] = True
+            dados['bandaArtistaAceitou'] = False
+            dados['idEmpresa'] = evento.idEmpresa
+            dados['idStatus'] = -3 # 'Aguandando aprovação'
+
+            contrato_serializer = ContratoSerializer(data=dados)
+            if contrato_serializer.is_valid():
+                contrato_serializer.save()
+                return JsonResponse(contrato_serializer.data, status=status.HTTP_201_CREATED) 
+            return JsonResponse(contrato_serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+def get_valor_ora_banda_artista(id_banda_artista):
+            banda_artista = BandaArtista.objects.get(pk=id_banda_artista)
+            return banda_artista.valorDataHora
+
+def get_evento(id_evento):
+            evento = Evento.objects.get(pk=id_evento)
+            return evento
+
 
 # @api_view(['POST'])
 # def add_instrumento(request):
