@@ -40,10 +40,6 @@ class BandaArtistaInstrumentos(models.Model):
     idBandaArtista = models.ForeignKey(BandaArtista, on_delete=models.CASCADE)
     idInstrumento = models.ForeignKey(Instrumento, on_delete=models.CASCADE)
 
-class BandaArtistaArquivo(models.Model):
-    idBandaArtista = models.ForeignKey(BandaArtista, on_delete=models.CASCADE)
-    pathArquivo = models.CharField(max_length=300, unique=True)
-
 ################################################################################################
 ############ EMPRESA ####################################################################################
 

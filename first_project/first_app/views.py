@@ -1,11 +1,12 @@
+from django.db.models.query import Prefetch
 from django.shortcuts import render
 
 from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
  
-from first_app.models import Instrumento, ResultadoMineracao, BandaArtista, Evento
-from first_app.serializers import ResultadoMineracaoSerializer, EmpresaSerializer, CupomSerializer, BandaArtistaSerializer, EventoSerializer, ContratoSerializer, InstrumentoSerializer
+from first_app.models import BandaArtistaInstrumentos, Instrumento, ResultadoMineracao, BandaArtista, Evento, BandaArtistaGeneroDeApresentacao
+from first_app.serializers import ResultadoMineracaoSerializer, EmpresaSerializer, CupomSerializer, BandaArtistaSerializer, EventoSerializer, ContratoSerializer, InstrumentoSerializer, BandaArtistaGeneroDeApresentacaoSerializer, BandaArtistaInstrumentosSerializer
 from rest_framework.decorators import api_view
 from first_app.mineracao import coletarDadosTweets
 import datetime
@@ -32,7 +33,7 @@ def gerar_dados_tweets(request):
             resultado_mineracao_serializer = ResultadoMineracaoSerializer(data=dados_resultado_mineracao)
             if resultado_mineracao_serializer.is_valid():
                 resultado_mineracao_serializer.save()
-                return JsonResponse(resultado_mineracao_serializer.data, status=status.HTTP_201_CREATED) 
+                return JsonResponse(resultado_mineracao_serializer.data, status=status.HTTP_200_OK) 
             return JsonResponse(resultado_mineracao_serializer.errors, status=status.HTTP_400_BAD_REQUEST)        
                 
 @api_view(['GET'])
@@ -115,19 +116,24 @@ def add_usuario(request):
             dados = request.data
 
             if(dados['idTipoUsuario'] == -1): #BandaArtista
-                dados['cpfOuCnpj'] = dados['cpfOuCnpj'].replace('.','').replace('-','').replace('/','')
-                banda_artista_serializer = BandaArtistaSerializer(data=dados)
-                if banda_artista_serializer.is_valid():
-                    banda_artista_serializer.save()
-                    return JsonResponse(banda_artista_serializer.data, status=status.HTTP_201_CREATED) 
-                return JsonResponse(banda_artista_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return add_banda_artista(dados)
             elif(dados['idTipoUsuario'] == -2): #Empresa
                 dados['cnpj'] = dados['cnpj'].replace('.','').replace('-','').replace('/','')
                 empresa_serializer = EmpresaSerializer(data=dados)
                 if empresa_serializer.is_valid():
                     empresa_serializer.save()
                     return JsonResponse(empresa_serializer.data, status=status.HTTP_201_CREATED) 
-                return JsonResponse(empresa_serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
+                return JsonResponse(empresa_serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+
+def add_banda_artista(dados): 
+    dados['cpfOuCnpj'] = dados['cpfOuCnpj'].replace('.','').replace('-','').replace('/','')
+    banda_artista_serializer = BandaArtistaSerializer(data=dados)
+    if banda_artista_serializer.is_valid():
+       banda_artista_serializer.save()   
+       return JsonResponse({"resultado":"Adicionado com sucesso"}, status=status.HTTP_201_CREATED) 
+    return JsonResponse(banda_artista_serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+ 
+
 
 @api_view(['POST'])
 def add_evento(request):
@@ -145,7 +151,7 @@ def add_contrato(request):
         if request.method == 'POST':
             dados = request.data 
 
-            valorDataHora = get_valor_ora_banda_artista(dados['idBandaArtista'])
+            valorDataHora = get_valor_hora_banda_artista(dados['idBandaArtista'])
             evento = get_evento(dados['idEvento']) 
 
             print(evento.idEmpresa.id)
@@ -162,13 +168,29 @@ def add_contrato(request):
                 return JsonResponse(contrato_serializer.data, status=status.HTTP_201_CREATED) 
             return JsonResponse(contrato_serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-def get_valor_ora_banda_artista(id_banda_artista):
+def get_valor_hora_banda_artista(id_banda_artista):
             banda_artista = BandaArtista.objects.get(pk=id_banda_artista)
             return banda_artista.valorDataHora
 
 def get_evento(id_evento):
             evento = Evento.objects.get(pk=id_evento)
-            return evento
+            return evento            
+
+@api_view(['GET'])
+def get_banda_artista(request, pk):
+            banda_artista = BandaArtista.objects.get(pk=pk)
+            generos = BandaArtistaGeneroDeApresentacao.objects.filter(idBandaArtista = pk)
+            instrumentos = BandaArtistaInstrumentos.objects.filter(idBandaArtista = pk)
+            banda_artista.generos = generos
+            banda_artista.instrumentos = instrumentos
+            banda_arista_serealize = BandaArtistaSerializer(banda_artista)
+            print(banda_arista_serealize.data)
+            return JsonResponse(banda_arista_serealize.data, status=status.HTTP_200_OK) 
+
+@api_view(['GET'])
+def get_generos_banda_artista(request):
+            generos = BandaArtistaGeneroDeApresentacao.generosDeApresentacao
+            return JsonResponse(generos, status=status.HTTP_200_OK, safe =False) 
 
 
 # @api_view(['POST'])

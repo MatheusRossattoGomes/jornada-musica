@@ -1,5 +1,6 @@
 from django.conf.urls import url 
 from first_app import views 
+from django.urls import path
  
 urlpatterns = [ 
     # url(r'^api/instrumento$', views.add_instrumento),
@@ -12,4 +13,6 @@ urlpatterns = [
     url(r'^api/add_usuario$', views.add_usuario),
     url(r'^api/add_evento$', views.add_evento),
     url(r'^api/add_contrato$', views.add_contrato),
+    url(r'^api/get_generos_banda_artista$', views.get_generos_banda_artista),
+    path('api/get_banda_artista/<int:pk>', views.get_banda_artista),
 ]
