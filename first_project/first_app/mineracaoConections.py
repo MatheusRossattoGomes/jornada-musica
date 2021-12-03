@@ -1,4 +1,4 @@
-consumer_key= 'MarKp0L63tolHN97W7Ia2Dg8c'
-consumer_secret= 'dkS2usoIff2c9Mb84n2vOahXO4xyMaxH7MSKpwTXAgs665VXXX'
-access_token='104078085-rF6rOgvMJ4WOzBRVVnHhWxMmtpr7PaQv5tPT79up'
-access_token_secret='GV2ifq8jWDMfAxWcyvCbEpwndtWwKN9Gwohu5hKZ4YHrr'
+consumer_key= ''
+consumer_secret= ''
+access_token=''
+access_token_secret=''
